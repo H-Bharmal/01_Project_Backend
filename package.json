@@ -1,0 +1,16 @@
+{
+  "name": "01_project_learn",
+  "version": "1.0.0",
+  "description": "Project based learning for backend",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "author": "Hamza Bharmal",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
+  }
+}
