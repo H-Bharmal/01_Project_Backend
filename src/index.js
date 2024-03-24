@@ -2,7 +2,7 @@
 import 'dotenv/config'
 
 import dbConnect from "./db/index.js"
-import app from "./app.js"
+import {app} from "./app.js"
 
 // async methods return a promise whenever called
 dbConnect()
@@ -11,8 +11,8 @@ dbConnect()
         console.log("Server is running at port :", process.env.PORT) ;
     })
 })
-.catch((err)=>{
-    
+.catch((error)=>{
+
     //  TODO : Find what is this
     app.on('error', (error)=>{
         console.log("Database error", error);
