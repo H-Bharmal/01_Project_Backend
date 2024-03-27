@@ -30,4 +30,16 @@ app.use(express.static("public"))
 // cookie parser is used so that cookies from server can be set into browser, somethings some cookies can be accessed by only the server, such things are done by cookie parser
 app.use(cookieParser());
 
+
+// routes import
+import userRouter from "./routes/user.routes.js"
+// we canot use app.get() since controller and routes are now seperate
+// hence we need to have middleware
+// Like this --> // app.use("/users", userRouter);
+// benefit of doing this is
+//  now the uri : http://localhost:8000/users/<this part will be now further handled by userRouters>
+
+app.use("/api/v1/users", userRouter);
+
+
 export { app }

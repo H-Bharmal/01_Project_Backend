@@ -9,7 +9,7 @@ const dbConnect = async ()=>{
         console.log(connection.connection.host);
     }
     catch(error){
-        console.log("Error connecting mongoDB", error);
+        console.log("Error connecting mongoDB\n\n", error);
         process.exit(1);
     }
 }
