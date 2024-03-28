@@ -71,7 +71,7 @@ userSchema.methods.generateAccessToken = function(){
         // param 1 is payload
         {
             _id : this._id,
-            email : TouchList.email,
+            email : this.email,
             username : this.username,
             fullName : this.fullName
         },
