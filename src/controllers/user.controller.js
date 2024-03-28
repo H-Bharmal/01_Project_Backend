@@ -33,7 +33,7 @@ const registerUser = asyncHandler( async(req, res)=>{
         throw new ApiError(400, "All fields are required");
     }
 
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or : [{username},{email}]
     })
     if(existedUser){
@@ -43,6 +43,7 @@ const registerUser = asyncHandler( async(req, res)=>{
     // req.files is given by multer and here we use it to get images and avatar
     const avatarLocalPath = req.files?.avatar[0]?.path ;
     console.log(req.files);
+    console.log(avatarLocalPath);
     const coverImageLocalPath = req.files?.coverImage[0]?.path ;
 
     if(!avatarLocalPath){
@@ -54,19 +55,19 @@ const registerUser = asyncHandler( async(req, res)=>{
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
     if(!avatar) 
-        throw new ApiError(400, "Avatar is required");
+        throw new ApiError(500, "Avatar upload unsuccessful");
 
-    const user = User.create({
+    const user = await User.create({
         fullName,
         email,
         password,
-        avatar : avatar.path,
+        avatar : avatar.url,
         coverImage : coverImage?.url || "",
         username : username.toLowerCase()
     })
 
     // Now validate if user is createad
-    const createdUser = User.findById(user._id).select(
+    const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     );
 
