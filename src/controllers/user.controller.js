@@ -365,4 +365,5 @@ export {registerUser, loginUser, logoutUser, refreshAccessToken,
 changeUserPassword,
 getCurrentUser,
 updateAccountDetails,
-updateUserAvatar,};
+updateUserAvatar,
+updateUserCoverImage};
