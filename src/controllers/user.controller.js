@@ -242,4 +242,127 @@ try {
 }
 
 })
-export {registerUser, loginUser, logoutUser, refreshAccessToken};
+
+// Changing the passwrod, method for it
+const changeUserPassword = asyncHandler(async(req, res)=>{
+    // Get the details (old password, new password)
+    const {oldPassword, newPassword} = req.body
+    // verify if user is logged in
+    // It will be verified by the middleware,hence we will have user object
+    const user= await User.findById(req.user?._id) ;
+    if(!user){
+        throw new ApiError(400,"Authentication error");
+    }
+
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+
+    if(!isPasswordCorrect){
+        throw new ApiError(401,"Invalid Credentials")
+    }
+
+    // update the password o/w
+    user.password = newPassword; 
+    await user.save({validateBeforeSave:true});
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200,{}, "Password Changed Successfully"))
+
+})
+
+const getCurrentUser = asyncHandler(async (req,res)=>{
+    return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "Current User Fetched"))
+})
+
+const updateAccountDetails = asyncHandler(async(req,res)=>{
+    const {fullName, email} = req.body;
+
+    if(!fullName && !email){
+        throw new ApiError(400, "All fields are required");
+    }
+    // HERE WHEN WE ARE UPDATING THE EMAIL AND FULLNAME, WE ARE NOT CHANGING THE ACCESS TOKEN AGAIN, IT IS OK SINCE ALL USAGE OF ACCESS TOKEN USUALLY HAVE ID AS USED PARAMETER, BUT THIS IS A LOOPHOLE
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {
+                fullName,
+                email
+            }
+        },
+        {
+            new : true
+        }
+    ).select("-password");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "user details updated successfully"))
+})
+
+const updateUserAvatar = asyncHandler(async (req, res)=>{
+    // First we check if we have avatar file
+    const avatarLocalPath = req.file?.path;
+
+    if(!avatarLocalPath){
+        throw new ApiError(400,"avatar is required")
+    }
+
+    // upload on cloudinary
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    if(!avatar.url){
+        throw new ApiError(500, "Error uploading Avatar")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {avatar : avatar.url}
+        },
+        {
+            new:true
+        }
+        ).select("-password")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar updated successfully"))
+})
+
+const updateUserCoverImage = asyncHandler(async (req, res)=>{
+    // First we check if we have avatar file
+    const coverImageLocalPath = req.file?.path;
+
+    if(!coverImageLocalPath){
+        throw new ApiError(400,"coverImage is required")
+    }
+
+    // upload on cloudinary
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+    if(!coverImage.url){
+        throw new ApiError(500, "Error uploading Avatar")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {coverImage : coverImage.url}
+        },
+        {
+            new:true
+        }
+        ).select("-password")
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Cover Image updated successfully"))
+})
+
+export {registerUser, loginUser, logoutUser, refreshAccessToken,
+changeUserPassword,
+getCurrentUser,
+updateAccountDetails,
+updateUserAvatar,};
